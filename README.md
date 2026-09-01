@@ -24,7 +24,7 @@ A comparação ingênua superestima o resultado da campanha em **4,5 vezes**.
 Traduzido para decisão: é a diferença entre manter uma régua que se paga e
 manter uma régua que queima verba.
 
-![naive vs pareado](figuras/03-naive-vs-pareado.png)
+![naive vs pareado](03-naive-vs-pareado.png)
 
 O efeito verdadeiro é conhecido porque a base é sintética e o contrafactual de
 cada cliente foi gerado explicitamente. Isso permite **auditar o estimador**, o
@@ -46,7 +46,7 @@ Antes de qualquer correção, os dois grupos não são comparáveis:
 SMD é a diferença padronizada de médias. A convenção é que acima de 0,10 os
 grupos não são comparáveis. Três das quatro covariáveis passam de 0,25.
 
-![viés de seleção](figuras/02-vies-selecao.png)
+![viés de seleção](02-vies-selecao.png)
 
 ---
 
@@ -67,7 +67,7 @@ comportamental:
 **Validação antes de olhar o resultado.** O balanceamento é checado primeiro;
 se as covariáveis não fecham, a estimativa não é reportada.
 
-![balanceamento](figuras/01-balanceamento.png)
+![balanceamento](01-balanceamento.png)
 
 Após o pareamento, o |SMD| máximo cai de 0,405 para **0,004**.
 
@@ -92,12 +92,29 @@ O número agregado não serve para decidir. O que decide é qual régua entrega.
 | rentabilização | 7.368 | R$ 76,70 | [57,82 ; 96,68] | R$ 73,11 |
 | reativação | 4.920 | R$ 41,18 | [17,53 ; 66,26] | R$ 45,47 |
 
-![por estratégia](figuras/04-por-estrategia.png)
+![por estratégia](04-por-estrategia.png)
 
 O estimador recupera a ordem correta e acerta cada estratégia dentro do
 intervalo. Reativação tem o intervalo mais largo — efeito menor e mais
 disperso —, o que é exatamente o tipo de incerteza que precisa aparecer antes
 de alguém decidir cortar a régua.
+
+---
+
+## Dois problemas vizinhos
+
+**O holdout define o que você consegue enxergar.** Numa base elegível de 2
+milhões, um holdout de 5% detecta efeitos a partir de R$ 12,73 por cliente
+(1,1% do gasto médio). Para detectar R$ 5 seria preciso deixar 61,5% da base
+sem comunicação — ou seja, esse efeito é inatingível na prática, e saber disso
+antes evita meses de teste sem conclusão.
+
+**Cobertura ou frequência.** Com capacidade de disparo finita, o arranjo ótimo
+não é nenhum dos extremos: duas comunicações para 75% da base rende 10% mais
+que uma comunicação para 100%. A partir de oito contatos, a resposta por pessoa
+fica negativa.
+
+Ambos em `desenho_e_frequencia.py`.
 
 ---
 
@@ -121,15 +138,9 @@ Ser honesto sobre o que o método não faz é parte do método.
 
 ```bash
 pip install -r requirements.txt
-python src/gerar_dados.py     # gera dados/base_campanha.csv
-python src/analise.py         # roda o pipeline e salva figuras/
-```
-
-```
-├── src/gerar_dados.py   base sintética com viés de seleção e efeito conhecido
-├── src/analise.py       matching, balanceamento, testes e gráficos
-├── figuras/             saídas
-└── resultados/          incremental por estratégia (csv)
+python gerar_dados.py            # gera a base
+python analise.py                # matching, testes e figuras
+python desenho_e_frequencia.py   # holdout e cobertura x frequência
 ```
 
 ## Sobre os dados
@@ -141,10 +152,10 @@ que o estimador acerta.
 Para rodar contra dado público real, os dois mais próximos deste problema são
 o **Hillstrom MineThatData Email Challenge** (64 mil clientes, campanha de
 e-mail com controle e gasto como desfecho) e o **Criteo Uplift Prediction
-Dataset**. O pipeline em `analise.py` só depende das colunas
-`comunicado`, `gasto_pos` e das covariáveis pré-campanha — trocar a fonte é
-mudar o `read_csv` e a lista `COVARIAVEIS`.
+Dataset**. O pipeline em `analise.py` só depende das colunas `comunicado`,
+`gasto_pos` e das covariáveis pré-campanha — trocar a fonte é mudar o
+`read_csv` e a lista `COVARIAVEIS`.
 
 ---
 
-Nicolas Oliveira · [linkedin.com/in/nicolasoliveira23](https://www.linkedin.com/in/nicolasoliveira23)
+Nicolas Oliveira · [linkedin.com/in/nicolasoliveira23](https://www.linkedin.com/in/nicolasoliveira23) · [nicx23.github.io](https://nicx23.github.io)
